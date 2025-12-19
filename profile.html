@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile – Maison De FFM</title>
+    <link rel="stylesheet" href="profile.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <div class="navbar">
+        <div class="nav-left">
+            <img src="assets/logo/FFM.png" alt="Maison De FFM Logo">
+            <h2 class="nav-title">MAISON DE FFM</h2>
+        </div>
+        <div class="nav-center">
+            <a href="home.html">HOME</a>
+            <a href="about.html">ABOUT US</a>
+            <a href="services.html">SERVICES</a>
+            <a href="promos.html">PROMOS</a>
+            <a href="contact.html">CONTACT US</a>
+        </div>
+        <a href="booking.html" class="book-btn">BOOK NOW!</a>
+    </div>
+
+    <!-- USER PROFILE PAGE WRAPPER -->
+    <div class="profile-page">
+
+        <!-- Header -->
+        <header class="profile-header">
+            <h1>My Profile</h1>
+            <p>Manage your beauty & wellness bookings at home.</p>
+        </header>
+
+        <!-- User Information -->
+        <section class="profile-section user-info">
+            <div class="section-header">
+                <h2>User Information</h2>
+                <button id="edit-btn" class="btn-secondary">EDIT INFORMATION</button>
+            </div>
+
+            <div class="field">
+                <label>Full Name <span style="color:#ffdc5a;">*</span></label>
+                <span id="display-name" class="display-value">Guest</span>
+                <input type="text" id="edit-name" class="edit-input" placeholder="Enter full name" required style="display:none;">
+            </div>
+
+            <div class="field">
+                <label>Birthdate <span style="color:#ffdc5a;">*</span></label>
+                <span id="display-birthday" class="display-value">N/A</span>
+                <input type="date" id="edit-birthday" class="edit-input" required style="display:none;">
+            </div>
+
+            <div class="field">
+                <label>Email <span style="color:#ffdc5a;">*</span></label>
+                <span id="display-email" class="display-value">N/A</span>
+                <input type="email" id="edit-email" class="edit-input" placeholder="example@email.com" required style="display:none;">
+            </div>
+
+            <div class="field">
+                <label>Phone Number <span style="color:#ffdc5a;">*</span></label>
+                <span id="display-phone" class="display-value">N/A</span>
+                <input type="tel" 
+                       id="edit-phone" 
+                       class="edit-input" 
+                       maxlength="11" 
+                       placeholder="e.g. 09123456789" 
+                       required 
+                       style="display:none;">
+            </div>
+
+            <div class="field">
+                <label>Address <span style="color:#ffdc5a;">*</span></label>
+                <span id="display-address" class="display-value">N/A</span>
+                <input type="text" id="edit-address" class="edit-input" placeholder="Enter full address" required style="display:none;">
+            </div>
+
+            <!-- Edit mode buttons -->
+            <div id="edit-actions" style="display:none; margin-top: 20px; text-align: right;">
+                <button id="cancel-btn" class="btn-secondary" style="margin-right: 10px;">CANCEL</button>
+                <button id="save-btn" class="btn-primary">SAVE CHANGES</button>
+            </div>
+
+            <!-- Success message -->
+            <div id="update-message" style="display:none; margin-top: 20px; padding: 14px; background: rgba(120, 200, 150, 0.3); border: 1px solid #a5ffcf; border-radius: 12px; color: #a5ffcf; text-align: center; font-size: 16px; letter-spacing: 1px;">
+                Profile updated successfully!
+            </div>
+        </section>
+
+        <!-- Appointment Tracker -->
+        <section class="profile-section appointments">
+            <h2>Appointment Tracker</h2>
+            <ul class="appointment-list" id="appointment-list">
+                <li style="text-align: center; color: #ccc; padding: 20px;">No appointments yet</li>
+            </ul>
+        </section>
+
+        <!-- Transaction History -->
+        <section class="profile-section transactions">
+            <h2>Transaction History</h2>
+            <ul class="transaction-list" id="transaction-list">
+                <li style="text-align: center; color: #ccc; padding: 20px;">No transactions yet</li>
+            </ul>
+        </section>
+
+        <!-- Safety Reports Button -->
+        <div style="text-align:center; margin: 32px 0;">
+            <a href="safety_reports.html" class="safety-btn" style="display:inline-block;padding:14px 28px;background:#b82b92;color:#fff;border-radius:8px;text-decoration:none;font-size:16px;letter-spacing:1px;">Submit Safety Report</a>
+        </div>
+
+        <!-- Logout Button -->
+        <footer class="profile-footer">
+            <button class="logout-btn" onclick="logout()">LOG OUT</button>
+        </footer>
+
+    </div>
+
+    <script>
+        // Redirect to login if not logged in
+        if (!localStorage.getItem("isLoggedIn")) {
+            window.location.href = "login.html";
+        }
+
+        let originalUserData = null;
+
+        // Load User Information
+        const storedUser = localStorage.getItem('mdffmUser');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            originalUserData = { ...user };
+
+            document.getElementById('display-name').textContent = user.name || 'Guest';
+            document.getElementById('edit-name').value = user.name || '';
+
+            document.getElementById('display-email').textContent = user.email || 'N/A';
+            document.getElementById('edit-email').value = user.email || '';
+
+            document.getElementById('display-phone').textContent = user.phone || 'N/A';
+            document.getElementById('edit-phone').value = user.phone || '';
+
+            document.getElementById('display-address').textContent = user.address || 'N/A';
+            document.getElementById('edit-address').value = user.address || '';
+
+            if (user.birthday) {
+                const date = new Date(user.birthday);
+                document.getElementById('display-birthday').textContent =
+                    date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                document.getElementById('edit-birthday').value = user.birthday.split('T')[0];
+            } else {
+                document.getElementById('display-birthday').textContent = 'N/A';
+            }
+        }
+
+        // Edit Button
+        document.getElementById('edit-btn').addEventListener('click', () => {
+            document.querySelector('.user-info').classList.add('editing');
+            document.querySelectorAll('.display-value').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.edit-input').forEach(el => el.style.display = 'block');
+            document.getElementById('edit-actions').style.display = 'block';
+            document.getElementById('edit-btn').style.display = 'none';
+        });
+
+        // Cancel Button
+        document.getElementById('cancel-btn').addEventListener('click', () => {
+            if (originalUserData) {
+                document.getElementById('edit-name').value = originalUserData.name || '';
+                document.getElementById('edit-email').value = originalUserData.email || '';
+                document.getElementById('edit-phone').value = originalUserData.phone || '';
+                document.getElementById('edit-address').value = originalUserData.address || '';
+                document.getElementById('edit-birthday').value = originalUserData.birthday ? originalUserData.birthday.split('T')[0] : '';
+            }
+            exitEditMode();
+        });
+
+        // Save Button - All fields required + 18+ age check
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const name = document.getElementById('edit-name').value.trim();
+            const email = document.getElementById('edit-email').value.trim().toLowerCase();
+            const phoneRaw = document.getElementById('edit-phone').value.trim();
+            const address = document.getElementById('edit-address').value.trim();
+            const birthday = document.getElementById('edit-birthday').value;
+
+            // Clean phone number (digits only)
+            const phone = phoneRaw.replace(/\D/g, '');
+
+            // === VALIDATION ===
+
+            if (!name) {
+                alert("Full Name is required!");
+                return;
+            }
+
+            if (!email || !email.includes('@') || !email.includes('.')) {
+                alert("Please enter a valid email address (e.g., name@example.com)");
+                return;
+            }
+
+            if (phone.length !== 11) {
+                alert("Phone number must be exactly 11 digits (e.g., 09123456789)");
+                return;
+            }
+
+            if (!address) {
+                alert("Address is required!");
+                return;
+            }
+
+            if (!birthday) {
+                alert("Birthdate is required!");
+                return;
+            }
+
+            // Age restriction: Must be 18+ as of December 19, 2025
+            const birthDate = new Date(birthday);
+            const today = new Date('2025-12-19'); 
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            if (age < 18) {
+                alert(" You must be at least 18 years old to use this service.");
+                return;
+            }
+
+            // All validations passed
+            const updatedUser = {
+                name: name,
+                email: email,
+                phone: phone,
+                address: address,
+                birthday: birthday
+            };
+
+            // Save to localStorage
+            localStorage.setItem('mdffmUser', JSON.stringify(updatedUser));
+
+            // Update display
+            document.getElementById('display-name').textContent = updatedUser.name;
+            document.getElementById('display-email').textContent = updatedUser.email;
+            document.getElementById('display-phone').textContent = updatedUser.phone;
+            document.getElementById('display-address').textContent = updatedUser.address;
+
+            const date = new Date(updatedUser.birthday);
+            document.getElementById('display-birthday').textContent =
+                date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            // Update backup
+            originalUserData = { ...updatedUser };
+
+            // Success message
+            const msg = document.getElementById('update-message');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+
+            exitEditMode();
+        });
+
+        function exitEditMode() {
+            document.querySelector('.user-info').classList.remove('editing');
+            document.querySelectorAll('.display-value').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.edit-input').forEach(el => el.style.display = 'none');
+            document.getElementById('edit-actions').style.display = 'none';
+            document.getElementById('edit-btn').style.display = 'block';
+        }
+
+        // Load Bookings
+        const storedBooking = localStorage.getItem('bookingData');
+        const apptList = document.getElementById('appointment-list');
+        const txList = document.getElementById('transaction-list');
+
+        if (storedBooking) {
+            let bookings = JSON.parse(storedBooking);
+            if (!Array.isArray(bookings)) bookings = [bookings];
+
+            apptList.innerHTML = '';
+            txList.innerHTML = '';
+
+            bookings.forEach(booking => {
+                const servicesText = booking.services?.join(', ') || 'No services selected';
+
+                apptList.innerHTML += `
+                    <li class="appointment-item">
+                        <div class="appointment-main">
+                            <h3>${servicesText}</h3>
+                            <p>Beautician: ${booking.beautician || 'To be assigned'}</p>
+                        </div>
+                        <div class="appointment-meta">
+                            <p>${booking.date || '—'} • ${booking.time || '—'}</p>
+                            <span class="status status-upcoming">${booking.status || 'Upcoming'}</span>
+                        </div>
+                    </li>
+                `;
+
+                txList.innerHTML += `
+                    <li class="transaction-item">
+                        <div class="transaction-main">
+                            <h3>${servicesText}</h3>
+                            <p>${booking.date || '—'} • Home Service</p>
+                        </div>
+                        <div class="transaction-meta">
+                            <p class="amount">₱${(booking.totalPrice || 0).toLocaleString()}</p>
+                            <span class="status ${booking.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}">
+                                ${booking.paymentStatus || 'Pending'}
+                            </span>
+                        </div>
+                    </li>
+                `;
+            });
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("userEmail");
+
+            alert("You have been logged out successfully.");
+            window.location.href = "login.html";
+        }
+    </script>
+
+</body>
+</html>
