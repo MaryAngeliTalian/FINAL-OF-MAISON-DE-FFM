@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment | Maison De FFM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="booking.css">
+    <link rel="stylesheet" href="payment.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <img src="assets/logo/FFM.png" alt="Logo">
+        <div class="nav-title">MAISON DE FFM</div>
+    </div>
+    <div class="nav-center">
+        <a href="home.html">HOME</a>
+        <a href="about.html">ABOUT US</a>
+        <a href="services.html">SERVICES</a>
+        <a href="promos.html">PROMOS</a>
+        <a href="booking.html" class="active">BOOKING</a>
+        <a href="contact.html">CONTACT US</a>
+    </div>
+    <a href="login.html" class="logout-btn">LOG OUT</a>     
+    <a href="profile.html" class="profile-btn">PROFILE</a> 
+</nav>
+
+<div class="payment-hero">
+    <h1>SECURE PAYMENT</h1>
+    <p>Complete your payment to confirm your appointment</p>
+    <div class="secure-badge">
+        <span>Secure & Encrypted</span>
+    </div>
+</div>
+
+<div class="payment-container">
+
+    <div class="payment-summary">
+        <h2 class="summary-title">BOOKING SUMMARY</h2>
+        <div id="services-list"></div>
+        
+        <div class="summary-item" id="home-service-row">
+            <span>Home Service Fee</span>
+            <span>₱200</span>
+        </div>
+
+        <!-- Discount Row -->
+        <div class="summary-item" id="discount-row" style="display:none; color:#ffdc5a;">
+            <span id="discount-label">Discount Applied</span>
+            <span id="discount-amount">-₱0</span>
+        </div>
+        
+        <div class="summary-item summary-total">
+            <span>TOTAL TO PAY</span>
+            <span id="total-amount"></span>
+        </div>
+
+        <!-- Promo Code Input -->
+        <div class="promo-code-section">
+            <label>HAVE A PROMO CODE?</label>
+            <div class="promo-input-group">
+                <input type="text" id="promo-code" placeholder="Enter code" maxlength="20">
+                <button type="button" id="apply-promo-btn">APPLY</button>
+            </div>
+            <small id="promo-message" style="display:block; margin-top:8px; font-size:13px;"></small>
+        </div>
+
+        <!-- QR Code Section -->
+        <div id="qr-code-section" class="qr-code-section" style="display:none; text-align:center; margin-top:30px;">
+            <p style="font-size:16px; margin-bottom:15px; color:#ffd6e8;">
+                Scan to pay via <strong id="qr-method-name">GCash</strong>
+            </p>
+            <img src="assets/QRCODE.jpg" alt="Scan to Pay QR Code" style="width:220px; height:220px; border-radius:12px; border:3px solid #ffdc5a; box-shadow:0 0 25px rgba(255,220,90,0.6);">
+            <p style="font-size:14px; margin-top:12px; opacity:0.9; font-style:italic;">
+                Pay exactly <strong>₱<span id="qr-amount">0</span></strong> to this number
+            </p>
+        </div>
+    </div>
+
+    <div class="payment-methods">
+        <label class="payment-method selected" data-method="gcash">
+            <input type="radio" name="payment" value="gcash" checked>
+            <img src="assets/logo/gcashlogo.png" alt="GCash" class="payment-icon">
+            <span>GCash</span>
+        </label>
+        <label class="payment-method" data-method="maya">
+            <input type="radio" name="payment" value="maya">
+            <img src="assets/logo/PayMaya_Logo.png" alt="Maya" class="payment-icon">
+            <span>Maya</span>
+        </label>
+        <label class="payment-method" data-method="card">
+            <input type="radio" name="payment" value="card">
+            <img src="assets/logo/cardlogo.png" alt="Card" class="payment-icon">
+            <span>Credit / Debit Card</span>
+        </label>
+    </div>
+
+    <!-- GCash -->
+    <div id="gcash-info" class="payment-info active">
+        <div class="form-group">
+            <label>GCASH NUMBER</label>
+            <input type="tel" id="gcash-number" placeholder="09XXXXXXXXX" maxlength="11" required>
+        </div>
+        <div class="form-group">
+            <label>GCASH REGISTERED NAME</label>
+            <input type="text" id="gcash-name" placeholder="Full name as registered in GCash" required>
+        </div>
+        <div class="form-group">
+            <label>SCREENSHOT OF PAYMENT (Proof)</label>
+            <input type="file" id="gcash-proof" accept="image/jpeg,image/png,.jpg,.jpeg,.png" required>
+            <small>Upload clear screenshot after sending payment (JPEG or PNG only)</small>
+        </div>
+    </div>
+
+    <!-- Maya -->
+    <div id="maya-info" class="payment-info">
+        <div class="form-group">
+            <label>MAYA NUMBER</label>
+            <input type="tel" id="maya-number" placeholder="09XXXXXXXXX" maxlength="11" required>
+        </div>
+        <div class="form-group">
+            <label>MAYA REGISTERED NAME</label>
+            <input type="text" id="maya-name" placeholder="Full name as registered in Maya" required>
+        </div>
+        <div class="form-group">
+            <label>SCREENSHOT OF PAYMENT (Proof)</label>
+            <input type="file" id="maya-proof" accept="image/jpeg,image/png,.jpg,.jpeg,.png" required>
+            <small>Upload clear screenshot after sending payment (JPEG or PNG only)</small>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div id="card-info" class="payment-info">
+        <div class="form-group">
+            <label>CARD NUMBER</label>
+            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="form-group card-row">
+            <div>
+                <label>EXPIRY DATE</label>
+                <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5">
+            </div>
+            <div>
+                <label>CVV</label>
+                <input type="text" id="card-cvv" placeholder="123" maxlength="4">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>CARDHOLDER NAME</label>
+            <input type="text" id="card-name" placeholder="Full name on card">
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <button class="confirm-btn" onclick="processPayment()">
+        CONFIRM & PAY <span id="pay-amount">₱0</span>
+    </button>
+
+    <button class="back-btn" onclick="location.href='booking.html'">
+        ← BACK TO BOOKING
+    </button>
+</div>
+
+<script>
+    // Load booking data
+    const booking = JSON.parse(localStorage.getItem("bookingData"));
+    if (!booking || !booking.services || booking.services.length === 0) {
+        alert("No booking found. Please complete booking first.");
+        location.href = "booking.html";
+    }
+
+    const { services, totalPrice: servicesTotal, fullName, date, time, beautician } = booking;
+
+    let baseTotal = (servicesTotal || 0) + 200;
+    let discountAmount = 0;
+    let appliedPromo = "";
+
+    // Populate services (name only)
+    const list = document.getElementById("services-list");
+    services.forEach(service => {
+        const name = service.name || service;
+        const div = document.createElement("div");
+        div.className = "summary-item";
+        div.innerHTML = `<span>• ${name}</span>`;
+        list.appendChild(div);
+    });
+
+    // Always show Home Service Fee
+    document.getElementById("home-service-row").style.display = "flex";
+
+    // Update totals function
+    function updateTotals() {
+        const finalTotal = baseTotal - discountAmount;
+        document.getElementById("total-amount").textContent = `₱${finalTotal.toLocaleString()}`;
+        document.getElementById("pay-amount").textContent = `₱${finalTotal.toLocaleString()}`;
+        document.getElementById("qr-amount").textContent = finalTotal.toLocaleString();
+    }
+
+    updateTotals();
+
+    // Promo Code Logic
+    const promoInput = document.getElementById("promo-code");
+    const applyBtn = document.getElementById("apply-promo-btn");
+    const promoMessage = document.getElementById("promo-message");
+    const discountRow = document.getElementById("discount-row");
+    const discountLabel = document.getElementById("discount-label");
+    const discountAmountEl = document.getElementById("discount-amount");
+
+    applyBtn.addEventListener("click", () => {
+        const code = promoInput.value.trim().toUpperCase();
+
+        if (appliedPromo) {
+            promoMessage.textContent = "A promo code has already been applied.";
+            promoMessage.style.color = "#ffdc5a";
+            return;
+        }
+
+        if (code === "MYFIRST@FFM") {
+            discountAmount = Math.round(baseTotal * 0.20); // 20% off
+            appliedPromo = "first";
+            discountLabel.textContent = "New Client Offer (20% OFF)";
+        } else if (code === "MYBIRTHDAY@FFM") {
+            discountAmount = Math.round(baseTotal * 0.35); // 35% off
+            appliedPromo = "birthday";
+            discountLabel.textContent = "Birthday Promo (35% OFF)";
+        } else {
+            promoMessage.textContent = "Invalid promo code.";
+            promoMessage.style.color = "#ff6b6b";
+            return;
+        }
+
+        // Success
+        discountAmountEl.textContent = `-₱${discountAmount.toLocaleString()}`;
+        discountRow.style.display = "flex";
+        promoMessage.textContent = "Promo code applied successfully!";
+        promoMessage.style.color = "#a8e6cf";
+        promoInput.disabled = true;
+        applyBtn.disabled = true;
+
+        updateTotals();
+    });
+
+    promoInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") applyBtn.click();
+    });
+
+    // Payment method switching
+    function activatePaymentMethod(method) {
+        document.querySelectorAll('.payment-method').forEach(l => l.classList.remove('selected'));
+        document.querySelector(`.payment-method[data-method="${method}"]`).classList.add('selected');
+        document.querySelector(`input[value="${method}"]`).checked = true;
+        document.querySelectorAll('.payment-info').forEach(info => info.classList.remove('active'));
+        document.getElementById(method + '-info').classList.add('active');
+
+        const qrSection = document.getElementById("qr-code-section");
+        const qrMethodName = document.getElementById("qr-method-name");
+
+        if (method === "gcash" || method === "maya") {
+            qrSection.style.display = "block";
+            qrMethodName.textContent = method === "gcash" ? "GCash" : "Maya";
+        } else {
+            qrSection.style.display = "none";
+        }
+    }
+
+    document.querySelectorAll('.payment-method').forEach(label => {
+        label.addEventListener('click', function(e) {
+            if (e.target.tagName === 'INPUT') return;
+            activatePaymentMethod(this.dataset.method);
+        });
+    });
+
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            activatePaymentMethod(this.value);
+        });
+    });
+
+    activatePaymentMethod('gcash');
+
+    // Strict file validation
+    function validateImageFile(inputId) {
+        const input = document.getElementById(inputId);
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert("Invalid file type! Please upload only JPEG or PNG images.");
+                    this.value = '';
+                }
+            }
+        });
+    }
+
+    validateImageFile('gcash-proof');
+    validateImageFile('maya-proof');
+
+    // Process payment
+    function processPayment() {
+        const method = document.querySelector('input[name="payment"]:checked').value;
+        let missing = [];
+
+        if (method === "gcash") {
+            if (!document.getElementById("gcash-number").value.trim()) missing.push("GCash Number");
+            if (!document.getElementById("gcash-name").value.trim()) missing.push("GCash Name");
+            if (!document.getElementById("gcash-proof").files.length) missing.push("Payment Screenshot");
+        } else if (method === "maya") {
+            if (!document.getElementById("maya-number").value.trim()) missing.push("Maya Number");
+            if (!document.getElementById("maya-name").value.trim()) missing.push("Maya Name");
+            if (!document.getElementById("maya-proof").files.length) missing.push("Payment Screenshot");
+        } else if (method === "card") {
+            if (!document.getElementById("card-number").value.trim()) missing.push("Card Number");
+            if (!document.getElementById("card-expiry").value.trim()) missing.push("Expiry Date");
+            if (!document.getElementById("card-cvv").value.trim()) missing.push("CVV");
+            if (!document.getElementById("card-name").value.trim()) missing.push("Cardholder Name");
+        }
+
+        if (missing.length > 0) {
+            alert("Please fill in: " + missing.join(", "));
+            return;
+        }
+
+        const finalTotal = baseTotal - discountAmount;
+        const methodName = method === "gcash" ? "GCash" : method === "maya" ? "Maya" : "Card";
+
+        let msg = `Thank you, ${fullName}!\n\nYour appointment is confirmed!\n\n` +
+                  `Total Paid: ₱${finalTotal.toLocaleString()} via ${methodName.toUpperCase()}`;
+
+        if (appliedPromo) {
+            const promoText = appliedPromo === "first" ? "New Client Offer (20% OFF)" : "Birthday Promo (35% OFF)";
+            msg += `\nApplied Promo: ${promoText}`;
+        }
+
+        msg += `\nBeautician: ${beautician || "To be assigned"}\n` +
+               `Date & Time: ${date} at ${time}\n\n` +
+               `We will contact you shortly with confirmation and details. `;
+
+        alert(msg);
+
+        localStorage.setItem("paymentCompleted", "true");
+        localStorage.setItem("paymentMethod", method);
+        localStorage.setItem("finalAmount", finalTotal);
+        if (appliedPromo) localStorage.setItem("appliedPromo", appliedPromo);
+
+        location.href = "thank.html";
+    }
+</script>
+
+</body>
+</html>

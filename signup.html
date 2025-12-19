@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | Maison De FFM</title>
+    <link rel="stylesheet" href="signup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <!-- LEFT SIDE: Branding -->
+        <div class="login-left">
+            <img src="assets/logo/FFM.png" alt="Maison De FFM Logo" class="login-logo">
+            <h1>MAISON DE FFM</h1>
+            <p>Premium Home Beauty & Wellness</p>
+        </div>
+
+        <!-- RIGHT SIDE: Signup Form -->
+        <div class="login-right">
+            <div class="login-box">
+                <h2>Create Account</h2>
+                <p class="subtitle">Join us for personalized beauty at home</p>
+
+                <form id="signup-form">
+                    <input type="text" name="fullName" placeholder="Full Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="tel" id="phone" name="phone" placeholder="Phone Number (09.........)" maxlength="11" required>
+                    <input type="text" name="address" placeholder="Full Address" required>
+
+                    <div class="select-wrapper">
+                        <select name="gender" required>
+                            <option value="" disabled selected>Gender</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                        </select>
+                    </div>
+
+                    <div class="birthday-wrapper">
+                        <label>Date of Birth</label>
+                        <input type="date" name="birthday" id="birthday" required>
+                    </div>
+
+                    <input type="password" name="password" placeholder="Password" required minlength="6">
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+
+                    <!-- Account Type Dropdown with Beautician -->
+                    <div class="select-wrapper account-type-wrapper">
+                        <select name="accountType" id="account-type" required>
+                            <option value="" disabled selected>Account Type</option>
+                            <option value="client">Client</option>
+                            <option value="beautician">Beautician</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <!-- Code Field (for Admin & Beautician) -->
+                    <div class="admin-code-wrapper">
+                        <input type="text" id="signup-admin-code" placeholder="CODE (Required only for Admin/Beautician)">
+                        <small class="admin-note">Enter code only if registering as Admin or Beautician</small>
+                    </div>
+
+                    <button type="submit" class="login-submit">SIGN UP</button>
+                </form>
+
+                <div class="signup">
+                    Already have an account? <a href="login.html">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const ADMIN_CODE = "FFMADMIN2025";
+    const BEAUTICIAN_CODE = "BEAUTICIANFFM2025";
+
+    const form = document.getElementById('signup-form');
+    const accountTypeSelect = document.getElementById('account-type');
+    const codeInput = document.getElementById('signup-admin-code');
+    const birthdayInput = document.getElementById('birthday');
+    const phoneInput = document.getElementById('phone');
+    const codeNote = document.querySelector('.admin-note');
+
+    // Phone number formatting
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+        
+        // Force start with 09
+        if (value.length > 0 && value[0] !== '9') {
+            value = '9' + value.slice(1);
+        }
+        if (value.length > 1) {
+            value = '09' + value.slice(2);
+        }
+        
+        // Limit to 11 digits
+        value = value.slice(0, 11);
+        
+        e.target.value = value;
+    });
+
+    // Prevent paste of invalid numbers
+    phoneInput.addEventListener('paste', function(e) {
+        e.preventDefault();
+        let pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+        if (pasted.length > 0 && pasted[0] !== '9') pasted = '9' + pasted.slice(1);
+        if (pasted.length > 1) pasted = '09' + pasted.slice(2);
+        pasted = pasted.slice(0, 11);
+        this.value = pasted;
+    });
+
+    // Dynamically update code field based on selected role
+    accountTypeSelect.addEventListener('change', function () {
+        if (this.value === 'admin' || this.value === 'beautician') {
+            codeInput.required = true;
+            codeInput.placeholder = "CODE (Required)";
+            codeNote.style.opacity = "1";
+        } else {
+            codeInput.required = false;
+            codeInput.placeholder = "CODE (Optional - leave blank)";
+            codeNote.style.opacity = "0.6";
+        }
+    });
+
+    // Age validation: user must be 18+
+    function isUser18OrOlder(birthDateString) {
+        if (!birthDateString) return false;
+        const birthDate = new Date(birthDateString);
+        const today = new Date();
+
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 18;
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Phone validation
+        const phone = phoneInput.value;
+        if (!/^09[0-9]{9}$/.test(phone)) {
+            alert("Phone number must be exactly 11 digits and start with 09 (e.g. 09123456789)");
+            return;
+        }
+
+        // Age restriction check
+        if (!isUser18OrOlder(birthdayInput.value)) {
+            alert("You must be at least 18 years old to create an account.");
+            return;
+        }
+
+        // Password match check
+        const pwd = form.password.value;
+        const confirm = form.confirmPassword.value;
+        if (pwd !== confirm) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        if (pwd.length < 6) {
+            alert('Password must be at least 6 characters long.');
+            return;
+        }
+
+        const selectedRole = accountTypeSelect.value;
+
+        // Validate code for Admin or Beautician
+        if (selectedRole === 'admin') {
+            const enteredCode = codeInput.value.trim().toUpperCase();
+            if (enteredCode !== ADMIN_CODE) {
+                alert('Invalid Admin Code.');
+                return;
+            }
+        } else if (selectedRole === 'beautician') {
+            const enteredCode = codeInput.value.trim().toUpperCase();
+            if (enteredCode !== BEAUTICIAN_CODE) {
+                alert('Invalid Beautician Code.');
+                return;
+            }
+        }
+
+        // Save user data
+        const userData = {
+            name: form.fullName.value.trim(),
+            email: form.email.value.trim(),
+            phone: form.phone.value.trim(),
+            birthday: form.birthday.value,
+            address: form.address.value.trim(),
+            gender: form.gender.value,
+            role: selectedRole
+        };
+
+        localStorage.setItem('mdffmUser', JSON.stringify(userData));
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", selectedRole);
+        localStorage.setItem("userEmail", form.email.value.trim());
+
+        alert("Account created successfully!");
+
+        // Redirect based on role
+        if (selectedRole === 'admin') {
+            window.location.href = "admin.html";
+        } else if (selectedRole === 'beautician') {
+            window.location.href = "beauticianspage.html";
+        } else {
+            window.location.href = "home.html";
+        }
+    });
+    </script>
+
+</body>
+</html>
